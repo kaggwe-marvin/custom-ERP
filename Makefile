@@ -15,4 +15,9 @@ lint:
 test:
 	poetry run pytest
 
+clean:
+	find . -type d -name "__pycache__" -exec rm -rf {} \;
+	find . -type f -name "*.pyc" -delete
+
+
 start pipeline: format lint test
