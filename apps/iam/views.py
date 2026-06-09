@@ -1,70 +1,31 @@
 from typing import Any
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from apps.iam.models import Document, EnterpriseUser, JobTitle
 
 
-class IAMDashboardView(TemplateView):
+class IAMDashboardView(LoginRequiredMixin, TemplateView):
+    """The enterprise access control view requiring real database session tokens."""
+
     template_name = "iam/dashboard.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        active_user = self.request.user
 
-        # Read persona selection from GET parameters to switch identities dynamically
-        selected_role = self.request.GET.get("simulate_role", JobTitle.FINANCE_MGR)
-        selected_region = self.request.GET.get("simulate_region", "EU")
+        # Explicit type guard ensuring compliance with strict type rules
+        assert isinstance(active_user, EnterpriseUser)
 
-        # Fallback safeguard against unsanitized arguments
-        if selected_role not in JobTitle.values:
-            selected_role = JobTitle.FINANCE_MGR
+        # Safe programmatic extraction of name characters for UI fallback avatars
+        first = getattr(active_user, "first_name", "E")[:1]
+        last = getattr(active_user, "last_name", "P")[:1]
+        active_user.initials = f"{first}{last}".upper()  # type: ignore
 
-        # 1. Instantiate current identity based on UI controls
-        active_user = EnterpriseUser(
-            username=f"simulated_{selected_role.lower()}",
-            first_name="Simulation",
-            last_name="Persona",
-            job_title=selected_role,
-            department="Operations Cluster",
-            region=selected_region,
-        )
-        active_user.initials = "SP"  # type: ignore
+        # Context-aware query filtering: Evaluate permissions dynamically across documents
+        all_documents = Document.objects.select_related("owner").all()
 
-        # 2. Base structural references
-        us_sales_rep = EnterpriseUser(username="sales_us", region="US")
-        hq_cfo = EnterpriseUser(username="cfo_global", region="Global")
-
-        # 3. Security protected document corpus
-        sample_documents = [
-            Document(
-                title="Q2 European Tax Provisioning",
-                classification="CONFIDENTIAL",
-                owner=hq_cfo,
-                target_region="EU",
-            ),
-            Document(
-                title="US Market Pipeline Strategy",
-                classification="CRITICAL",
-                owner=us_sales_rep,
-                target_region="US",
-            ),
-            Document(
-                title="Global Restructuring Ledger",
-                classification="CRITICAL",
-                owner=hq_cfo,
-                target_region="Global",
-            ),
-        ]
-
-        # 4. Evaluate access rules dynamically
         dataset = []
-        for doc in sample_documents:
-            # Grant simulated viewing privileges to match baseline capabilities
-            if not f"document.view" in active_user.ROLE_CAPABILITIES.get(
-                active_user.job_title, []
-            ):
-                active_user.ROLE_CAPABILITIES.setdefault(
-                    active_user.job_title, []
-                ).append("document.view")
-
+        for doc in all_documents:
             dataset.append(
                 {"document": doc, "has_access": doc.permits_user(active_user, "view")}
             )

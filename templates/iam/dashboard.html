@@ -12,22 +12,22 @@
     <div class="min-h-full flex flex-col">
         <!-- Main Header -->
         <header class="bg-slate-900 text-white shadow-md">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <!-- Changed shield-check to fa-shield-halved -->
-                    <i class="fa-solid fa-shield-halved text-2xl text-emerald-400"></i>
-                    <span class="text-xl font-bold tracking-tight">NexusERP // IAM Engine</span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-slate-200">Active Simulation</p>
-                        <p class="text-xs text-slate-400 font-mono">{{ user.job_title }} [{{ user.region }}]</p>
-                    </div>
-                    <div class="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
-                        {{ user.initials }}
-                    </div>
-                </div>
-            </div>
+            <!-- Inside templates/iam/dashboard.html header block -->
+<div class="flex items-center space-x-4">
+    <div class="text-right">
+        <p class="text-sm font-semibold text-slate-200">{{ user.first_name }} {{ user.last_name }}</p>
+        <p class="text-xs text-slate-400 font-mono">{{ user.job_title }} // {{ user.region }}</p>
+    </div>
+    <form method="POST" action="{% url 'apps_iam:logout' %}" class="inline">
+        {% csrf_token %}
+        <button type="submit" class="p-1.5 rounded-md hover:bg-slate-800 text-slate-400 hover:text-rose-400 transition" title="Terminate Session">
+            <!-- Changed power to fa-power-off -->
+            <i class="fa-solid fa-power-off text-lg"></i>
+        </button>
+    </form>
+</div>
+
+
         </header>
 
         <!-- Simulation Control Bar -->

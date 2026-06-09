@@ -122,3 +122,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Explicitly swap the primary authentication model to our RBAC/ABAC engine
 AUTH_USER_MODEL = "apps_iam.EnterpriseUser"
+# [SECURITY CONFIGURATION] Canonical location of the authentication gateway
+LOGIN_URL = "apps_iam:login"
+
+# [SECURITY CONFIGURATION] Default landing location upon successful authentication token initialization
+LOGIN_REDIRECT_URL = "apps_iam:dashboard"
+
+# [SECURITY CONFIGURATION] Forces all logout actions (App or Admin) to route directly back to the root page
+LOGOUT_REDIRECT_URL = "/"
