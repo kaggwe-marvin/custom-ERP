@@ -1,7 +1,10 @@
 .PHONY: run lint format test migrate
 
 run dev:
-	poetry run python manage.py runserver
+	poetry run daphne config.asgi:application
+
+# 	poetry run python manage.py runserver
+
 
 migrate:
 	poetry run python manage.py migrate
