@@ -1,0 +1,49 @@
+name: Continuous Integration Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  quality-assurance:
+    name: Code Quality & Test Validation
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Pull the codebase workspace context down to the runner
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Setup the target runtime interpreter environment
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    # 3. Cache Poetry dependencies to slash deployment workflow speeds
+    - name: Cache Poetry Virtual Environment
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    # 4. Bootstrap toolchain engine packaging controls
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    # 5. Populate local vendor dependencies (including development stack) not on root
+    - name: Install Dependencies
+      run: poetry install --no-root
+
+    # 6. Execute your exact local verification tool suite
+    - name: Run Unified Validation Check Pipeline
+      run: make pipeline
