@@ -2,6 +2,10 @@ from typing import Any
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from apps.iam.models import Document, EnterpriseUser, JobTitle
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
 
 
 class IAMDashboardView(LoginRequiredMixin, TemplateView):
@@ -34,3 +38,43 @@ class IAMDashboardView(LoginRequiredMixin, TemplateView):
         context["dataset"] = dataset
         context["available_roles"] = JobTitle.choices
         return context
+
+
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from apps.iam.models import EnterpriseUser, JobTitle
+
+
+class EnterpriseUserCreationForm(UserCreationForm):
+    """Custom instantiation form injecting corporate classification markers."""
+
+    class Meta(UserCreationForm.Meta):
+        model = EnterpriseUser
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "job_title",
+            "department",
+            "region",
+        )
+
+
+class EnterpriseSignUpView(CreateView):
+    """Transactional creation point for onboarding operational user profiles."""
+
+    model = EnterpriseUser
+    form_class = EnterpriseUserCreationForm
+    template_name = "iam/signup.html"
+    success_url = reverse_lazy("apps_iam:login")
+
+    def form_valid(self, form: Any) -> Any:
+        # Enforce normal workspace standard privileges by default
+        user = form.save(commit=False)
+        user.is_staff = False
+        user.is_superuser = False
+        user.save()
+        return super().form_valid(form)

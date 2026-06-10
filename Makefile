@@ -5,7 +5,8 @@ run dev:
 
 # 	poetry run python manage.py runserver
 
-
+migrations:
+	poetry run python manage.py makemigrations apps_iam
 migrate:
 	poetry run python manage.py migrate
 
@@ -18,9 +19,12 @@ lint:
 test:
 	poetry run pytest
 
+clear:
+	clear
+
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} \;
 	find . -type f -name "*.pyc" -delete
 
 
-start pipeline: format lint test
+start pipeline: clear migrations clear migrate clear format lint test

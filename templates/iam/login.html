@@ -32,6 +32,11 @@
                 <i class="fa-solid fa-shield-halved text-sm"></i> Establish Connection Token
             </button>
         </form>
+        <!-- Append to templates/iam/login.html beneath the form block -->
+<div class="text-center pt-2">
+    <p class="text-sm text-slate-500">Need corporate credentials? <a href="{% url 'apps_iam:signup' %}" class="text-indigo-600 hover:text-indigo-500 font-semibold">Request Profile Onboarding</a></p>
+</div>
+
     </div>
 </body>
 </html>

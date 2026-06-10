@@ -1,6 +1,6 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
-from apps.iam.views import IAMDashboardView
+from apps.iam.views import IAMDashboardView, EnterpriseSignUpView
 
 app_name = "apps_iam"
 
@@ -14,4 +14,5 @@ urlpatterns = [
         name="login",
     ),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("signup/", EnterpriseSignUpView.as_view(), name="signup"),
 ]
