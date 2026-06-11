@@ -28,5 +28,5 @@ clean:
 	find . -type f -name "*.pyc" -delete
 
 
-pipeline:
-	migrations migrate format lint test
+pipeline: 
+	migrate format lint test
