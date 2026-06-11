@@ -21,25 +21,20 @@ class TestFinancialLedgerEngine:
             code="3010", name="Share Capital", type=AccountType.EQUITY
         )
 
-        # Initialize an isolated journal shell context
         entry = JournalEntry.objects.create(
             description="Initial Funding Venture", posted_by=user
         )
 
-        # Add an unbalanced line (Debit only)
         LedgerLine.objects.create(
             journal_entry=entry, account=cash, debit=Decimal("50000.0000")
         )
 
-        # Attempting to finalize this entry must throw an explicit structural ValidationError
         with pytest.raises(ValidationError):
             entry.post_to_ledger()
 
-        # Add the balancing transaction line item to resolve the validation check
         LedgerLine.objects.create(
             journal_entry=entry, account=equity, credit=Decimal("50000.0000")
         )
 
-        # The ledger validation check should now pass cleanly
         entry.post_to_ledger()
         assert entry.is_posted is True

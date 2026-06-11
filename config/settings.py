@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
+import os
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,13 +22,53 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
+# Support env variables from .env file if defined
+env_path = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_path):
+    load_dotenv(env_path)
+
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-zq2mf5m2w%)=w!lqx+q(rk3x4vbxyc@6gi@gd!$9+3c*66c@ls"
+
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-zq2mf5m2w%)=w!lqx+q(rk3x4vbxyc@6gi@gd!$9+3c*66c@ls",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = (
+    True
+    if os.environ.get("DJANGO_DEBUG", "False").lower() in ("true", "1", "t")
+    else False
+)
+if not DEBUG:
+    SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or ""
+    if not SECRET_KEY or SECRET_KEY.startswith("django-insecure-"):
+        raise ValueError(
+            "CRITICAL SECURITY CONFIGURATION FAILURE: "
+            "A secure, production-grade DJANGO_SECRET_KEY must be provided in deployment."
+        )
+else:
+    # Use the local fallback insecure string when testing features locally
+    SECRET_KEY = os.environ.get(
+        "DJANGO_INSECURE_SECRET_KEY",
+        "django-insecure-zq2mf5m2w%)=w!lqx+q(rk3x4vbxyc@6gi@gd!$9+3c*66c@ls",
+    )
 
-ALLOWED_HOSTS: list[str] = []
+# 3. Dynamic Network Routing Boundaries
+ALLOWED_HOSTS: list[str] = [
+    host.strip()
+    for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    if host
+]
+
+# Explicit flag allowing manual deactivation of SSL redirection loops locally
+SECURE_SSL_REQUIRED = os.environ.get("DJANGO_SECURE_SSL", str(not DEBUG)).lower() in (
+    "true",
+    "1",
+    "t",
+    "yes",
+)
 
 
 # Application definition
@@ -134,7 +177,7 @@ STORAGES = {
 }
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-ASGI_APPLICATION = "myproject.asgi.application"
+ASGI_APPLICATION = "config.asgi.application"
 
 
 # Explicitly swap the primary authentication model to our RBAC/ABAC engine
@@ -147,3 +190,31 @@ LOGIN_REDIRECT_URL = "apps_iam:dashboard"
 
 # [SECURITY CONFIGURATION] Forces all logout actions (App or Admin) to route directly back to the root page
 LOGOUT_REDIRECT_URL = "/"
+
+# 3. Production Security Hardening Matrix Configuration
+if not DEBUG:
+    # Force HSTS policies (Enforces HTTPS on the client browser for 1 continuous year)
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Enforce cookie transit layer isolation flags
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # Prevent browsers from incorrectly inferring content types away from declared headers
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    # Activate cross-site scripting filter shields inside older browser runtimes
+    SECURE_BROWSER_XSS_FILTER = True
+else:
+    # Explicit development safeguards to ensure local tests run without SSL cert issues
+    SECURE_HSTS_SECONDS = 0
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+# 4. Dedicated SSL Routing Directive Rule block (Independent of DEBUG state)
+if SECURE_SSL_REQUIRED:
+    SECURE_SSL_REDIRECT = True
+else:
+    SECURE_SSL_REDIRECT = False

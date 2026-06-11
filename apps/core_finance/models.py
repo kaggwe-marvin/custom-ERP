@@ -58,7 +58,7 @@ class JournalEntry(models.Model):
             if lines_queryset.exists():
                 total_debits = sum(line.debit_base for line in lines_queryset)
                 total_credits = sum(line.credit_base for line in lines_queryset)
-                # Check for zero balance using 4 decimal precision
+
                 if abs(total_debits - total_credits) > Decimal("0.0001"):
                     raise ValidationError(
                         f"Imbalanced Base Equation: Base Debits ({total_debits}) must match Base Credits ({total_credits})."
@@ -86,13 +86,11 @@ class LedgerLine(models.Model):
     )
     account: models.ForeignKey = models.ForeignKey(Account, on_delete=models.PROTECT)
 
-    # Original Transaction Currency Data
     currency: models.CharField = models.CharField(max_length=3, default="USD")
     exchange_rate: models.DecimalField = models.DecimalField(
         max_digits=12, decimal_places=6, default=Decimal("1.000000")
     )
 
-    # Entered amounts
     debit: models.DecimalField = models.DecimalField(
         max_digits=18, decimal_places=4, default=Decimal("0.0000")
     )
@@ -100,7 +98,6 @@ class LedgerLine(models.Model):
         max_digits=18, decimal_places=4, default=Decimal("0.0000")
     )
 
-    # Standardized normalized columns for reporting (Calculated values)
     debit_base: models.DecimalField = models.DecimalField(
         max_digits=18, decimal_places=4, default=Decimal("0.0000")
     )
@@ -142,7 +139,6 @@ class Customer(models.Model):
     company_name: models.CharField = models.CharField(max_length=150, unique=True)
     billing_email: models.EmailField = models.EmailField()
 
-    # Made nullable to allow seamless zero-downtime database structural migrations
     receivable_account: models.ForeignKey = models.ForeignKey(
         Account,
         on_delete=models.PROTECT,
@@ -165,7 +161,6 @@ class Invoice(models.Model):
         max_length=50, unique=True, db_index=True
     )
 
-    # Made nullable to allow smooth migration path over existing database rows
     customer: models.ForeignKey = models.ForeignKey(
         Customer,
         on_delete=models.PROTECT,
@@ -183,7 +178,7 @@ class Invoice(models.Model):
     lines: models.Manager["InvoiceLine"]
 
     def __str__(self) -> str:
-        # Safe string fallback handling if an orphaned migration record lacks a customer
+
         comp_name = self.customer.company_name if self.customer else "UNASSIGNED"
         return f"INV-{self.invoice_number} // {comp_name}"
 
@@ -205,7 +200,6 @@ class InvoiceLine(models.Model):
         primary_key=True, default=uuid.uuid4, editable=False
     )
 
-    # Made nullable to allow smooth migration path over existing database rows
     invoice: models.ForeignKey = models.ForeignKey(
         Invoice, on_delete=models.CASCADE, related_name="lines", null=True, blank=True
     )

@@ -41,8 +41,6 @@ class TestIAMSecurityEngine:
             target_region="US",
         )
 
-        # Use natural 'document.view' capability since sales reps default to leads.view
-        # For this specific test context, we assess the document restriction policy directly
         assert doc.permits_user(owner, "view") is False
         assert doc.permits_user(foreign_user, "view") is False
 

@@ -19,10 +19,19 @@ class EnterpriseUser(AbstractUser):
     department: models.CharField = models.CharField(max_length=100, db_index=True)
     region: models.CharField = models.CharField(max_length=50, default="Global")
 
-    # Fixed dictionary fallback interface
+    @property
+    def initials(self) -> str:
+        """Programmatic extraction of name characters for UI fallback avatars."""
+        first = (
+            self.first_name[:1]
+            if self.first_name
+            else (self.username[:1] if self.username else "E")
+        )
+        last = self.last_name[:1] if self.last_name else "P"
+        return f"{first}{last}".upper()
+
     @property
     def role_capabilities_map(self) -> dict[str, list[str]]:
-        """Returns a pristine copy of structural operational mappings to block test leaks."""
         return {
             JobTitle.CEO: ["*"],
             JobTitle.FINANCE_MGR: [

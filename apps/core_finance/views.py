@@ -20,11 +20,9 @@ class FinancialReportDashboardView(LoginRequiredMixin, TemplateView):
         accounts = Account.objects.all()
         trial_balance: List[Dict[str, Any]] = []
 
-        # Grand totals in base currency (USD)
         total_debit_base = Decimal("0.0000")
         total_credit_base = Decimal("0.0000")
 
-        # Balance Sheet structural tracking
         assets: List[Dict[str, Any]] = []
         liabilities: List[Dict[str, Any]] = []
         equity: List[Dict[str, Any]] = []
@@ -34,7 +32,7 @@ class FinancialReportDashboardView(LoginRequiredMixin, TemplateView):
         total_equity = Decimal("0.0000")
 
         for acct in accounts:
-            # 1. Fetch all finalized ledger lines for this specific account
+
             lines = LedgerLine.objects.filter(
                 account=acct, journal_entry__is_posted=True
             )
@@ -42,13 +40,11 @@ class FinancialReportDashboardView(LoginRequiredMixin, TemplateView):
             if not lines.exists():
                 continue
 
-            # 2. Extract transaction details grouped by currency
             currencies_involved = lines.values_list("currency", flat=True).distinct()
 
             for curr in currencies_involved:
                 curr_lines = lines.filter(currency=curr)
 
-                # Sum up values for this currency tier
                 debits_orig = curr_lines.aggregate(Sum("debit"))[
                     "debit__sum"
                 ] or Decimal("0.0000")
@@ -63,11 +59,9 @@ class FinancialReportDashboardView(LoginRequiredMixin, TemplateView):
                     "credit_base__sum"
                 ] or Decimal("0.0000")
 
-                # Track running totals for the overall ledger account summary rows
                 total_debit_base += debits_base
                 total_credit_base += credits_base
 
-                # 3. Handle Balance Sheet account updates
                 if acct.type == AccountType.ASSET:
                     net_asset = debits_base - credits_base
                     if net_asset > 0:
@@ -107,7 +101,6 @@ class FinancialReportDashboardView(LoginRequiredMixin, TemplateView):
                         )
                         total_equity += net_eq
 
-                # Append to trial balance worksheet data
                 trial_balance.append(
                     {
                         "code": acct.code,
@@ -145,7 +138,7 @@ class PrintableInvoiceDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "invoice"
 
     def get_object(self, queryset: Any = None) -> Invoice:
-        # Override lookups to map cleanly via the natural invoice_number string
+
         return get_object_or_404(
             Invoice, invoice_number=self.kwargs.get("invoice_number")
         )

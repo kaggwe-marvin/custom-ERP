@@ -11,7 +11,7 @@ class LiveCurrencyService:
     @staticmethod
     def get_usd_rates() -> Dict[str, Decimal]:
         """Fetches the latest rates against USD. Falls back safely if the connection fails."""
-        # Using a reliable open API endpoint for live corporate conversions
+
         url = "https://er-api.com"
 
         try:
@@ -22,9 +22,8 @@ class LiveCurrencyService:
                     rates: Dict[str, Any] = data.get("rates", {})
                     return {k: Decimal(str(v)) for k, v in rates.items()}
         except Exception:
-            pass  # Fall back to safe offline static parameters if the API is down
+            pass
 
-        # Offline fallbacks to maintain system stability
         return {
             "USD": Decimal("1.000000"),
             "EUR": Decimal("0.925000"),

@@ -32,7 +32,6 @@ class TestMultiCurrencyEngine:
             description="European Investment Injection", posted_by=user
         )
 
-        # Post an entry in EUR using an explicit static conversion factor (1 EUR = 1.08 USD)
         rate = Decimal("1.080000")
         line1 = LedgerLine.objects.create(
             journal_entry=entry,
@@ -49,10 +48,8 @@ class TestMultiCurrencyEngine:
             credit=Decimal("10000.0000"),
         )
 
-        # Confirm calculations match base currency parameters (10,000 * 1.08 = 10,800 USD)
         assert line1.debit_base == Decimal("10800.0000")
         assert line2.credit_base == Decimal("10800.0000")
 
-        # Verify that the general entry balance check runs successfully
         entry.post_to_ledger()
         assert entry.is_posted is True

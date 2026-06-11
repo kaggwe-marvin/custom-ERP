@@ -12,14 +12,11 @@ class TestAuditTrailEngine:
         client = Client()
         url = reverse("apps_iam:dashboard")
 
-        # Confirm the database log table is currently empty
         assert SecurityAuditEvent.objects.count() == 0
 
-        # Requesting a protected path triggers a 302 redirect
         response = client.get(url)
         assert response.status_code == 302
 
-        # Verify that an event was captured automatically by the middleware layer
         assert SecurityAuditEvent.objects.count() == 1
         event = SecurityAuditEvent.objects.first()
         assert event is not None
