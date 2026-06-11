@@ -1,13 +1,10 @@
-.PHONY: run lint format test migrate
+.PHONY: run dev migrate format lint test clear clean pipeline
 
 run dev:
 	poetry run daphne config.asgi:application
 
-# 	poetry run python manage.py runserver
+# poetry run python manage.py runserver
 
-# migrations:
-# 	poetry run python manage.py makemigrations apps_iam
-# 	poetry run python manage.py makemigrations core_finance
 migrate:
 	poetry run python manage.py migrate
 
@@ -27,6 +24,4 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} \;
 	find . -type f -name "*.pyc" -delete
 
-
-pipeline: 
-	migrate format lint test
+pipeline: migrate format lint test
