@@ -5,9 +5,9 @@ run dev:
 
 # 	poetry run python manage.py runserver
 
-migrations:
-	poetry run python manage.py makemigrations apps_iam
-	poetry run python manage.py makemigrations core_finance
+# migrations:
+# 	poetry run python manage.py makemigrations apps_iam
+# 	poetry run python manage.py makemigrations core_finance
 migrate:
 	poetry run python manage.py migrate
 
