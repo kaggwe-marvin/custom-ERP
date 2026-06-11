@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <title>CustomERP // Multi-Currency Intelligence</title>
+    <!-- Fixed Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="h-full font-sans antialiased text-slate-900">
+    <div class="min-h-full flex flex-col">
+        
+        <!-- Dashboard Sub-Header / Branding -->
+        <header class="bg-slate-900 text-white shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <!-- Changed globe to fa-earth-americas -->
+                    <i class="fa-solid fa-earth-americas text-2xl text-indigo-400"></i>
+                    <span class="text-xl font-bold tracking-tight">CustomERP // Multi-Currency Control Ledger</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-mono bg-indigo-950 text-indigo-300 px-3 py-1 rounded border border-indigo-800">
+                        Base Token: USD
+                    </span>
+                    <a href="{% url 'apps_iam:dashboard' %}" class="text-sm font-medium text-slate-400 hover:text-white transition">
+                        IAM Portal
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace View Layout -->
+        <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-8">
+            
+            <!-- Section 1: Advanced Trial Balance Worksheet -->
+            <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b pb-3">
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <!-- Changed table-properties to fa-table-list -->
+                        <i class="fa-solid fa-table-list text-indigo-600"></i> Cross-Border Trial Balance Sheet
+                    </h2>
+                </div>
+                
+                <div class="overflow-hidden border border-slate-100 rounded-lg">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="px-4 py-3 text-left">Account</th>
+                                <th class="px-2 py-3 text-center">Currency</th>
+                                <th class="px-4 py-3 text-right bg-slate-100/50">Debit (Original)</th>
+                                <th class="px-4 py-3 text-right bg-slate-100/50">Credit (Original)</th>
+                                <th class="px-4 py-3 text-right bg-indigo-50/50 text-indigo-700">Debit (USD Base)</th>
+                                <th class="px-4 py-3 text-right bg-indigo-50/50 text-indigo-700">Credit (USD Base)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white text-sm font-mono">
+                            {% for item in trial_balance %}
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-3 font-sans font-medium text-slate-900">
+                                    <span class="text-xs font-bold font-mono bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded mr-2">{{ item.code }}</span>{{ item.name }}
+                                </td>
+                                <td class="px-2 py-3 text-center font-bold text-indigo-600">
+                                    {{ item.currency }}
+                                </td>
+                                <td class="px-4 py-3 text-right text-slate-500">${{ item.debit_orig|floatformat:2 }}</td>
+                                <td class="px-4 py-3 text-right text-slate-500">${{ item.credit_orig|floatformat:2 }}</td>
+                                <td class="px-4 py-3 text-right text-emerald-600 font-bold bg-indigo-50/20">${{ item.debit_base|floatformat:2 }}</td>
+                                <td class="px-4 py-3 text-right text-blue-600 font-bold bg-indigo-50/20">${{ item.credit_base|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-slate-400 font-sans">No live multi-currency logs committed to storage.</td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="bg-slate-900 text-white font-bold font-sans">
+                                <td colspan="4" class="px-4 py-3.5 text-right uppercase tracking-wider text-xs text-slate-400">Balanced Verification Baseline:</td>
+                                <td class="px-4 py-3.5 text-right text-emerald-400 font-mono text-base">${{ total_debit_base|floatformat:2 }}</td>
+                                <td class="px-4 py-3.5 text-right text-indigo-400 font-mono text-base">${{ total_credit_base|floatformat:2 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 2: Real-Time Dynamic Balance Sheet Blocks -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Assets Pillar -->
+                <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-md font-bold flex items-center gap-2 border-b pb-2 text-slate-800">
+                        <!-- Changed shield-alert to fa-shield-halved -->
+                        <i class="fa-solid fa-shield-halved text-emerald-500 text-lg"></i> Monitored Asset Classes
+                    </h3>
+                    <ul class="divide-y divide-slate-100 text-sm space-y-1">
+                        {% for asset in assets %}
+                        <li class="flex justify-between items-center py-2 font-mono">
+                            <span class="text-slate-700 font-sans font-medium">{{ asset.name }}</span>
+                            <div class="text-right">
+                                <p class="text-xs text-slate-400">{{ asset.orig_bal|floatformat:2 }} {{ asset.currency }}</p>
+                                <p class="font-bold text-slate-900">${{ asset.base_bal|floatformat:2 }} USD</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        <li class="flex justify-between items-center pt-4 font-bold border-t text-slate-900 text-base">
+                            <span>Total Assets Assets:</span>
+                            <span class="font-mono text-emerald-600">${{ total_assets|floatformat:2 }}</span>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Liabilities & Capital Position -->
+                <section class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
+                    <div class="space-y-2">
+                        <h3 class="text-md font-bold flex items-center gap-2 border-b pb-2 text-slate-800">
+                            <!-- Changed arrow-down-right to fa-arrow-down-long -->
+                            <i class="fa-solid fa-arrow-down-long text-rose-500 text-lg"></i> Claims & External Liabilities
+                        </h3>
+                        <ul class="divide-y divide-slate-100 text-sm">
+                            {% for liab in liabilities %}
+                            <li class="flex justify-between items-center py-2 font-mono">
+                                <span class="text-slate-700 font-sans font-medium">{{ liab.name }}</span>
+                                <div class="text-right">
+                                    <p class="text-xs text-slate-400">{{ liab.orig_bal|floatformat:2 }} {{ liab.currency }}</p>
+                                    <p class="font-bold text-slate-900">${{ liab.base_bal|floatformat:2 }} USD</p>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

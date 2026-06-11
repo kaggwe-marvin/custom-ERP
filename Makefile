@@ -7,6 +7,7 @@ run dev:
 
 migrations:
 	poetry run python manage.py makemigrations apps_iam
+	poetry run python manage.py makemigrations core_finance
 migrate:
 	poetry run python manage.py migrate
 
@@ -27,4 +28,4 @@ clean:
 	find . -type f -name "*.pyc" -delete
 
 
-start pipeline: clear migrations clear migrate clear format lint test
+pipeline: clear migrations migrate format lint test

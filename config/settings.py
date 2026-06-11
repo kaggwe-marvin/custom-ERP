@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "apps.iam.apps.IamConfig",
+    "apps.core_finance.apps.CoreFinanceConfig",
 ]
 
 MIDDLEWARE = [
