@@ -2,6 +2,7 @@
 name = "enterprise-erp"
 version = "0.1.0"
 description = "ERP system for SME's"
+license = "MIT"
 authors = [
     {name = "kaggwe-marvin",email = "129196464+kaggwe-marvin@users.noreply.github.com"}
 ]

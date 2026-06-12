@@ -8,7 +8,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+  
 
 jobs:
   quality-assurance:
@@ -47,4 +47,6 @@ jobs:
 
     # 6. Execute your exact local verification tool suite
     - name: Run Unified Validation Check Pipeline
+      env:
+        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       run: make pipeline
