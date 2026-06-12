@@ -49,4 +49,6 @@ jobs:
     - name: Run Unified Validation Check Pipeline
       env:
         DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+        DJANGO_SECURE_SSL: 'False'
+        DJANGO_DEBUG: 'True'
       run: make pipeline

@@ -62,13 +62,13 @@ ALLOWED_HOSTS: list[str] = [
     if host
 ]
 
-# Explicit flag allowing manual deactivation of SSL redirection loops locally
-SECURE_SSL_REQUIRED = os.environ.get("DJANGO_SECURE_SSL", str(not DEBUG)).lower() in (
-    "true",
-    "1",
-    "t",
-    "yes",
-)
+# # Explicit flag allowing manual deactivation of SSL redirection loops locally
+# SECURE_SSL_REQUIRED = os.environ.get("DJANGO_SECURE_SSL", str(not DEBUG)).lower() in (
+#     "true",
+#     "1",
+#     "t",
+#     "yes",
+# )
 
 
 # Application definition
@@ -191,30 +191,30 @@ LOGIN_REDIRECT_URL = "apps_iam:dashboard"
 # [SECURITY CONFIGURATION] Forces all logout actions (App or Admin) to route directly back to the root page
 LOGOUT_REDIRECT_URL = "/"
 
-# 3. Production Security Hardening Matrix Configuration
-if not DEBUG:
-    # Force HSTS policies (Enforces HTTPS on the client browser for 1 continuous year)
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+# # 3. Production Security Hardening Matrix Configuration
+# if not DEBUG:
+#     # Force HSTS policies (Enforces HTTPS on the client browser for 1 continuous year)
+#     SECURE_HSTS_SECONDS = 31536000
+#     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#     SECURE_HSTS_PRELOAD = True
 
-    # Enforce cookie transit layer isolation flags
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+#     # Enforce cookie transit layer isolation flags
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
 
-    # Prevent browsers from incorrectly inferring content types away from declared headers
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+#     # Prevent browsers from incorrectly inferring content types away from declared headers
+#     SECURE_CONTENT_TYPE_NOSNIFF = True
 
-    # Activate cross-site scripting filter shields inside older browser runtimes
-    SECURE_BROWSER_XSS_FILTER = True
-else:
-    # Explicit development safeguards to ensure local tests run without SSL cert issues
-    SECURE_HSTS_SECONDS = 0
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
+#     # Activate cross-site scripting filter shields inside older browser runtimes
+#     SECURE_BROWSER_XSS_FILTER = True
+# else:
+#     # Explicit development safeguards to ensure local tests run without SSL cert issues
+#     SECURE_HSTS_SECONDS = 0
+#     SESSION_COOKIE_SECURE = False
+#     CSRF_COOKIE_SECURE = False
 
-# 4. Dedicated SSL Routing Directive Rule block (Independent of DEBUG state)
-if SECURE_SSL_REQUIRED:
-    SECURE_SSL_REDIRECT = True
-else:
-    SECURE_SSL_REDIRECT = False
+# # 4. Dedicated SSL Routing Directive Rule block (Independent of DEBUG state)
+# if SECURE_SSL_REQUIRED:
+#     SECURE_SSL_REDIRECT = True
+# else:
+#     SECURE_SSL_REDIRECT = False
