@@ -74,7 +74,7 @@ The platform emphasizes:
 | Static Assets         | WhiteNoise             |
 | Environment Variables | python-dotenv          |
 | Frontend Styling      | Tailwind CSS           |
-| Icons                 | Lucide                 |
+| Icons                 | Font Awesome           |
 | Automation            | Makefile               |
 
 ---
@@ -95,7 +95,7 @@ CustomERP follows a **Modular Monolith Architecture**.
 ├─────────────────────────────────────┤
 │         Shared Django Core          │
 ├─────────────────────────────────────┤
-│         PostgreSQL / SQLite         │
+│          SQLite                     │
 └─────────────────────────────────────┘
 ```
 
@@ -225,7 +225,7 @@ poetry run daphne config.asgi:application
 Application URL:
 
 ```text
-http://localhost:8000
+http://127.0.0.1:8000
 ```
 
 ---
@@ -393,13 +393,8 @@ make pipeline
 
 ## License
 
-Specify the project license.
-
-Examples:
-
 * MIT
-* Apache 2.0
-* Proprietary / Internal Use Only
+
 
 ---
 

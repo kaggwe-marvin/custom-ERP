@@ -41,19 +41,19 @@ DEBUG = (
     if os.environ.get("DJANGO_DEBUG", "False").lower() in ("true", "1", "t")
     else False
 )
-if not DEBUG:
-    SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or ""
-    if not SECRET_KEY or SECRET_KEY.startswith("django-insecure-"):
-        raise ValueError(
-            "CRITICAL SECURITY CONFIGURATION FAILURE: "
-            "A secure, production-grade DJANGO_SECRET_KEY must be provided in deployment."
-        )
-else:
-    # Use the local fallback insecure string when testing features locally
-    SECRET_KEY = os.environ.get(
-        "DJANGO_INSECURE_SECRET_KEY",
-        "django-insecure-zq2mf5m2w%)=w!lqx+q(rk3x4vbxyc@6gi@gd!$9+3c*66c@ls",
-    )
+# if not DEBUG:
+#     SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or ""
+#     if not SECRET_KEY or SECRET_KEY.startswith("django-insecure-"):
+#         raise ValueError(
+#             "CRITICAL SECURITY CONFIGURATION FAILURE: "
+#             "A secure, production-grade DJANGO_SECRET_KEY must be provided in deployment."
+#         )
+# else:
+#     # Use the local fallback insecure string when testing features locally
+#     SECRET_KEY = os.environ.get(
+#         "DJANGO_INSECURE_SECRET_KEY",
+#         "django-insecure-zq2mf5m2w%)=w!lqx+q(rk3x4vbxyc@6gi@gd!$9+3c*66c@ls",
+#     )
 
 # 3. Dynamic Network Routing Boundaries
 ALLOWED_HOSTS: list[str] = [
